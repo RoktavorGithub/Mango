@@ -4,6 +4,7 @@ const { translate } = require("@vitalets/google-translate-api");
 const logger = require('@mirasaki/logger');
 
 module.exports = new ChatInputCommand({
+    global: true,
     data: { 
         description: "Translate your message to any language!",
         options: [
