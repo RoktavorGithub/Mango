@@ -1,0 +1,11 @@
+[
+  {
+    "userId": "999236733805805609",
+    "history": [
+      {
+        "user": "x^2 + 5x - 6 = 0",
+        "model": "To solve the quadratic equation \\( x^2 + 5x - 6 = 0 \\), we first need to find the factors of -6 that add up to 5. Those factors are 6 and -1. \n\nNow, we can rewrite the equation as a product of two binomials:\n\\( x^2 + 6x - x - 6 = 0 \\)\n\\( x(x + 6) - 1(x + 6) = 0 \\)\n\nFactor out the common binomial factor:\n\\( (x - 1)(x + 6) = 0 \\)\n\nNow, set each factor to zero to find the values of x:\n\\( x - 1 = 0 \\) or \\( x + 6 = 0 \\)\n\nSolving for x gives us:\n\\( x = 1 \\) or \\( x = -6 \\)\n\nTherefore, the solutions to the quadratic equation \\( x^2 + 5x - 6 = 0 \\) are \\( x = 1 \\) and \\( x = -6 \\)."
+      }
+    ]
+  }
+]

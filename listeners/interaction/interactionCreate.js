@@ -7,6 +7,7 @@ const { getPermissionLevel } = require('../../handlers/permissions');
 const {
   titleCase, getRuntime, clientConfig
 } = require('../../util');
+const Blacklist = require("../../schemas/blacklistSchema");
 
 // Destructure from origin file because it's
 // used in multiple functions
@@ -150,11 +151,14 @@ const runCommand = (client, interaction, activeId, cmdRunTimeStart) => {
   ].join(chalk.magentaBright(` ${ emojis.separator } `)));
 };
 
-module.exports = (client, interaction) => {
+module.exports = async (client, interaction) => {
   // Definitions
   const {
     member, channel, commandName, customId
   } = interaction;
+  const {
+    emojis
+  } = client.container;
 
   // Initial performance measuring timer
   const cmdRunTimeStart = process.hrtime.bigint();
@@ -194,8 +198,35 @@ module.exports = (client, interaction) => {
   if (isAutoComplete) {
     client.emit('autoCompleteInteraction', (interaction));
     return;
-  }
+  };
 
+  // Blacklisted User Check
+  const globalBlacklistedUser = await Blacklist.findOne({
+    userId: interaction.user.id,
+    isGlobal: true
+  });
+
+  if (globalBlacklistedUser) {
+    interaction.reply({
+      content: `${ emojis.error } You are blacklisted from using this bot globally. If you believe this is a mistake, please contact the bot owner.`,
+      ephemeral: true
+    });
+    return;
+  };
+
+  const serverBlacklistedUser = await Blacklist.findOne({
+    userId: interaction.user.id,
+    guildId: interaction.guildId
+  });
+
+  if (serverBlacklistedUser) {
+    interaction.reply({
+      content: `${ emojis.error } You are blacklisted from using this bot in this server. If you believe this is a mistake, please contact the bot owner.`,
+      ephemeral: true
+    });
+    return;
+  };
+  // Blacklist User Check End
   // Run the command
   // Has additional checks inside
   runCommand(client, interaction, activeId, cmdRunTimeStart);

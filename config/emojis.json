@@ -4,5 +4,6 @@
   "wait": "⏳ |",
   "info": "ℹ |",
   "separator": "•",
-  "unknown": "❓ |"
+  "unknown": "❓ |",
+  "clipboard": "📋 |"
 }
