@@ -5,7 +5,6 @@ const config = require("../../config");
 
 module.exports = new ChatInputCommand({
     permLevel: "Developer",
-    global: true,
     data: {
         description: "Disables the user's ability to use and utilize Mango.",
         options: [
@@ -67,7 +66,19 @@ module.exports = new ChatInputCommand({
     switch (action) {
         case "add":
             let existingBlacklist;
-        let newBlacklist;
+            let newBlacklist;
+
+            const globalBlacklist = await Blacklist.findOne({
+                userId: user.id,
+                isGlobal: true
+            });
+
+        if (globalBlacklist) {
+            return interaction.reply({
+                content: `${ emojis.error } ${user} is already blacklisted globally you can't blacklist him again via guild scope!`,
+                ephemeral: true
+            });
+        };
 
         if (isGlobal) {
             existingBlacklist = await Blacklist.findOne({
@@ -104,14 +115,29 @@ module.exports = new ChatInputCommand({
             return interaction.reply({ content: `${ emojis.success } ${user} has been blacklisted ${isGlobal ? 'globally' : 'in this server'}.`, ephemeral: true });
         
         case "remove":
-            const result = await Blacklist.deleteOne({
+            const globalblacklist = await Blacklist.findOne({
                 userId: user.id,
-                ...(isGlobal ? { isGlobal: true } : { guildId: guildId }),
+                isGlobal: true
             });
-            if (result.deletedCount === 0) {
-                return interaction.reply({ content: `${ emojis.error } ${user} is not blacklisted in ${isGlobal ? 'globally' : 'in this server'}.`, ephemeral: true });
+        
+            const guildBlacklist = await Blacklist.findOne({
+                userId: user.id,
+                guildId: guildId
+            });
+        
+            if (isGlobal) {
+                if (!globalblacklist) {
+                    return interaction.reply({ content: `${ emojis.error } ${user} is not blacklisted globally. ${guildBlacklist ? "They are blacklisted in this server. Use the guild-specific remove command instead." : ""}`, ephemeral: true });
+                };
+                await Blacklist.deleteOne({ _id: globalblacklist._id });
+                return interaction.reply({ content: `${ emojis.success } ${user} has been removed from the global blacklist.`, ephemeral: true });
+            } else {
+                if (!guildBlacklist) {
+                    return interaction.reply({ content: `${ emojis.error } ${user} is not blacklisted in this server. ${globalBlacklist ? "They are blacklisted globally. Use the global remove command instead." : ""}`, ephemeral: true });
+                }
+                await Blacklist.deleteOne({ _id: guildBlacklist._id });
+                return interaction.reply({ content: `${ emojis.success } ${user} has been removed from this server's blacklist.`, ephemeral: true });
             };
-            return interaction.reply({ content: `${ emojis.success } ${user} has been removed from the blacklist ${isGlobal ? 'globally' : 'in this server'}.`, ephemeral: true });
         
         case "check":
             const blacklistedUser = await Blacklist.findOne({
