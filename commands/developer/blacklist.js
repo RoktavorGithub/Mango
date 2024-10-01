@@ -5,6 +5,7 @@ const config = require("../../config");
 
 module.exports = new ChatInputCommand({
     permLevel: "Developer",
+    global: true,
     data: {
         description: "Disables the user's ability to use and utilize Mango.",
         options: [
